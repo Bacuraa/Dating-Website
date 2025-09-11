@@ -1,1 +1,12 @@
 node_modules/
+
+# build
+dist/
+
+# env & logs
+.env
+*.log
+
+# editors
+.vscode/
+.idea/
