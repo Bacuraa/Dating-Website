@@ -1,0 +1,26 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Gender {
+  male
+  female
+}
+
+model User {
+    id String @id @default(cuid())
+    name String
+    nickname String
+    gender Gender
+    birthday DateTime
+    city String
+    picture String
+    username String
+    password String
+    createdAt DateTime @default(now())
+}
