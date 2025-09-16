@@ -1,0 +1,2 @@
+npx prisma migrate dev --name init : creates the database
+npx prisma migrate reset : Reset the database and reapply all migrations (wipes data)
