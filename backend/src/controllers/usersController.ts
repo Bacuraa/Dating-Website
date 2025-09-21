@@ -1,34 +1,24 @@
 import { Request, Response } from "express";
 import { PrismaClient } from '@prisma/client';
 import bcrypt from "bcrypt";
+import { CreateUserSchema, CreateUserBody } from "../schemas/userSchemas.js";
 
-type CreateUserBody = {
-    name: string;
-    nickname: string;
-    gender: "male" | "female"; // match your enum in schema.prisma
-    birthday: string;          // ISO string from client, will convert to Date
-    city: string;
-    picture: string;
-    username: string;
-    password: string;
-}
 
 const prisma = new PrismaClient();
 
 export const addUser = async (req: Request<{}, {}, CreateUserBody>, res: Response) => {
     try {
+        const parsed = CreateUserSchema.safeParse(req.body);
+        if (!parsed.success) {
+            return res.status(400).json({
+                message: "Validation failed",
+                errors: parsed.error.issues, // array of { path, message, code }
+            });
+        }
+        const { password, birthday, ...rest } = parsed.data;
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
         const user = await prisma.user.create({
-            data: {
-                name: req.body.name,
-                nickname: req.body.nickname,
-                gender: req.body.gender,
-                birthday: new Date(req.body.birthday),
-                city: req.body.city,
-                picture: req.body.picture,
-                username: req.body.username,
-                password: hashedPassword,
-            },
+            data: { ...rest, birthday, password: hashedPassword },
             select: {
                 id: true,
                 createdAt: true,
